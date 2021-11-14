@@ -9,6 +9,10 @@ Use the package manager [pip](https://pip.pypa.io/en/stable/) to install the dep
 ```bash
 pip install flask
 ```
+or...
+```bash
+pip install -r requirements.txt
+```
 
 ## Usage
 

@@ -111,7 +111,7 @@ def developer_by_id(id):
                 {
                     'status': 'sucess',
                     'message': 'Dev deleted!'
-                }), 200
+                }), 204
         except Exception:
             response = {
                 'status': 'error',
