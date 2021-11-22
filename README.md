@@ -7,10 +7,6 @@ Developer_api is a Python app with Framework Flask to learn some basics things o
 Use the package manager [pip](https://pip.pypa.io/en/stable/) to install the dependencies.
 
 ```bash
-pip install flask
-```
-or...
-```bash
 pip install -r requirements.txt
 ```
 
