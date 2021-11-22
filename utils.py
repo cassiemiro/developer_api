@@ -1,34 +1,35 @@
-from models import People
+from models import Person
 
 
 def insert():
-    person = People(name="NonExist", age=19)
+    person = Person(name="Cassiemiro", age=22)
     person.save()
 
 
 def query():
-    people = People.query.all()
+    persons = Person.query.all()
 
-    for person in people:
+    for person in persons:
         print("name:", person.name + " age", person.age)
 
-    # person = People.query.filter_by(name="Felipe").first()
+    # person = Person.query.filter_by(name="Felipe").first()
     # print("Filter by name", person)
 
 
 def alter():
-    person = People.query.filter_by(name="NonExist").first()
+    person = Person.query.filter_by(name="felipe").first()
     person.age = 21
+    person.name = "Gilena"
     person.save()
 
 
 def delete():
-    person = People.query.filter_by(name="NonExist").first()
+    person = Person.query.filter_by(name="NonExist").first()
     person.delete()
 
 
 if __name__ == "__main__":
     # insert()
-    # alter()
-    delete()
+    alter()
+    # delete()
     query()
