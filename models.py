@@ -53,7 +53,7 @@ class Activities(Base):
         db_session.commit()
 
     def as_dict(self) -> dict:
-        return {"id": self.id, "name": self.name, "age": self.person}
+        return {"id": self.id, "name": self.name, "person": self.person.name}
 
 
 def init_db():
