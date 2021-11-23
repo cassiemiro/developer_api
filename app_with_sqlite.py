@@ -1,7 +1,8 @@
 from json.decoder import JSONDecodeError
 from flask import Flask, request
 from flask_restful import Resource, Api
-from models import Person
+from sqlalchemy.sql.sqltypes import _AbstractInterval
+from models import Activities, Person
 
 app = Flask(__name__)
 api = Api(app)
@@ -11,9 +12,15 @@ class ListCreatePerson(Resource):
     def post(self):
         try:
             data = request.json
-            new_person = Person(name=data["name"], age=data["age"])
-            new_person.save()
-
+            if data.get("name") and data.get("age"):
+                new_person = Person(name=data["name"], age=data["age"])
+                new_person.save()
+            else:
+                return {
+                    "error": "KeyError",
+                    "message": "Necessary all fields to create"
+                    " person (name, age)",
+                }, 400
             return new_person.as_dict()
 
         except JSONDecodeError:
@@ -43,7 +50,7 @@ class Persons(Resource):
             return person.as_dict()
         except AttributeError:
             return {
-                "error": "No object found",
+                "error": "error",
                 "message": "Person not found!",
             }, 404
 
@@ -51,15 +58,19 @@ class Persons(Resource):
         try:
             person = Person.query.filter_by(name=name).first()
             data = request.json
-            print(type(data))
-            if not ("name" in data):
-                raise AttributeError
-            if not ("age" in data):
-                raise AttributeError
+
+            if not ("name" in data) or not ("age" in data):
+                return {
+                    "error": "KeyError",
+                    "message": "Necessary all fields to update"
+                    " person (name, age)",
+                }, 400
             else:
                 person.name = data["name"]
                 person.age = data["age"]
+
                 person.save()
+
                 return person.as_dict(), 200
         except AttributeError:
             return {
@@ -97,8 +108,31 @@ class Persons(Resource):
             }, 400
 
 
+class ListCreateActivities(Resource):
+    def post(self):
+        data = request.json
+        person = Person.query.filter_by(name=data["person"]).first()
+        if not person:
+            return {
+                "error": "not found",
+                "message": f"Person with name {data['person']} not found",
+            }, 404
+
+        activity = Activities(name=data["name"], person=person)
+        activity.save()
+        return activity.as_dict()
+
+    def get(self):
+        activities = Activities.query.all()
+        data = []
+        for a in activities:
+            data.append(a.as_dict())
+        return data
+
+
 api.add_resource(Persons, "/person/<string:name>/")
 api.add_resource(ListCreatePerson, "/person/")
+api.add_resource(ListCreateActivities, "/activity/")
 
 if __name__ == "__main__":
     app.run(debug=True)
