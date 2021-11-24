@@ -1,14 +1,23 @@
 from json.decoder import JSONDecodeError
 from flask import Flask, request
 from flask_restful import Resource, Api
-from sqlalchemy.sql.sqltypes import _AbstractInterval
-from models import Activities, Person
+from models import Activities, Person, Users
+from flask_httpauth import HTTPBasicAuth
 
+auth = HTTPBasicAuth()
 app = Flask(__name__)
 api = Api(app)
 
 
+@auth.verify_password
+def auth_check(login, passw):
+    if not (login, passw):
+        return False
+    return Users.query.filter_by(login=login, password=passw).first()
+
+
 class ListCreatePerson(Resource):
+    @auth.login_required
     def post(self):
         try:
             data = request.json
@@ -54,6 +63,7 @@ class Persons(Resource):
                 "message": "Person not found!",
             }, 404
 
+    @auth.login_required
     def put(self, name):
         try:
             person = Person.query.filter_by(name=name).first()
@@ -78,6 +88,7 @@ class Persons(Resource):
                 "message": "Some Attribute not found",
             }, 400
 
+    @auth.login_required
     def patch(self, name):
         try:
             person = Person.query.filter_by(name=name).first()
@@ -91,6 +102,7 @@ class Persons(Resource):
         except Exception:
             return {"status": "error", "message": "Cannot patch Person"}, 400
 
+    @auth.login_required
     def delete(self, name):
         try:
             person = Person.query.filter_by(name=name).first()
@@ -109,6 +121,7 @@ class Persons(Resource):
 
 
 class ListCreateActivities(Resource):
+    @auth.login_required
     def post(self):
         data = request.json
         person = Person.query.filter_by(name=data["person"]).first()
