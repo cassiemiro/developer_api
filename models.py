@@ -56,6 +56,27 @@ class Activities(Base):
         return {"id": self.id, "name": self.name, "person": self.person.name}
 
 
+class Users(Base):
+    __tablename__ = "users"
+    id = Column(Integer, primary_key=True)
+    login = Column(Integer, unique=True)
+    password = Column(String(20))
+
+    def __repr__(self) -> str:
+        return f"<Users {self.login}>"
+
+    def save(self):
+        db_session.add(self)
+        db_session.commit()
+
+    def delete(self):
+        db_session.delete(self)
+        db_session.commit()
+
+    def as_dict(self) -> dict:
+        return {"id": self.id, "login": self.login}
+
+
 def init_db():
     Base.metadata.create_all(bind=engine)
 
